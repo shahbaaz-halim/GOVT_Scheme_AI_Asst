@@ -1,7 +1,6 @@
-# bootstrap/main.tf
-
 terraform {
   required_version = ">= 1.10.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -11,12 +10,15 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-south-2" # APAC Hyderabad region - change as needed
+  region = "ap-south-2"
 }
 
-# 1. The S3 Bucket for Terraform State File
+#################################################
+# Terraform State Bucket
+#################################################
+
 resource "aws_s3_bucket" "tf_state" {
-  bucket        = "shah-ai-tf-state-bucket" # MUST be globally unique
+  bucket        = "shah-ai-tf-state-bucket"
   force_destroy = false
 
   lifecycle {
@@ -26,12 +28,16 @@ resource "aws_s3_bucket" "tf_state" {
 
 resource "aws_s3_bucket_versioning" "state_versioning" {
   bucket = aws_s3_bucket.tf_state.id
+
   versioning_configuration {
-    status = "Enabled" # Essential! Allows you to roll back state if something breaks
+    status = "Enabled"
   }
 }
 
-# 2. The OIDC Provider (Tells AWS to trust GitHub tokens)
+#################################################
+# GitHub OIDC Provider
+#################################################
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -44,25 +50,33 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
-# 3. The IAM Role GitHub Actions will assume
+#################################################
+# GitHub Actions IAM Role
+#################################################
+
 resource "aws_iam_role" "github_actions_backend" {
   name = "github-actions-terraform-executor"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Effect = "Allow"
+
         Principal = {
           Federated = aws_iam_openid_connect_provider.github.arn
         }
+
         Action = "sts:AssumeRoleWithWebIdentity"
+
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
+
           StringLike = {
-            # ONLY allows your specific repo and main branch to assume this role
+            # Allow all branches and PRs initially
             "token.actions.githubusercontent.com:sub" = "repo:shahbaaz-halim/GOVT_Scheme_AI_Asst:*"
           }
         }
@@ -71,11 +85,18 @@ resource "aws_iam_role" "github_actions_backend" {
   })
 }
 
-# 4. Permissions for the CI/CD Role (Admin for a personal learning account)
+#################################################
+# Permissions
+#################################################
+
 resource "aws_iam_role_policy_attachment" "admin_attach" {
   role       = aws_iam_role.github_actions_backend.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
+
+#################################################
+# Outputs
+#################################################
 
 output "state_bucket_name" {
   value = aws_s3_bucket.tf_state.id

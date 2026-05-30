@@ -1,4 +1,4 @@
-name: "Terraform CI/CD Pipeline"
+name: Terraform CI/CD Pipeline
 
 on:
   push:
@@ -9,54 +9,55 @@ on:
       - main
 
 permissions:
-  id-token: write    # CRITICAL: Required for AWS OIDC authentication
-  contents: read     # Required to clone the codebase into the runner
+  id-token: write
+  contents: read
 
 jobs:
   terraform_pipeline:
-    name: "Validate & Deploy Infrastructure"
+    name: Validate & Deploy Infrastructure
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: ./infra
 
     steps:
-      # Step 1: Fetch the code from your repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Install Terraform CLI on the runner
+      - name: Debug GitHub Context
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.10.0"
+          terraform_version: 1.10.0
 
-      # Step 3: Authenticate with AWS via OIDC (No secrets/passwords used!)
       - name: Authenticate to AWS via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::731039145302:role/github-actions-terraform-executor
           aws-region: ap-south-2
-          audience: sts.amazonaws.com
 
-      # Step 4: Code Quality Gate - Check for messy indentations
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
       - name: Terraform Format Check
         run: terraform fmt -check
 
-      # Step 5: Initialize Backend & Download AWS Modules
       - name: Terraform Init
         run: terraform init
 
-      # Step 6: Code Quality Gate - Verify configuration syntax is accurate
       - name: Terraform Validate
         run: terraform validate
 
-      # Step 7: Run dry-run (Plan) ONLY on Pull Requests
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
 
-      # Step 8: Apply changes ONLY when a PR is merged into the main branch
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
