@@ -59,7 +59,7 @@ resource "aws_iam_role" "github_actions_backend" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:aud" = "sts:amazonaws.com"
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
             # ONLY allows your specific repo and main branch to assume this role
