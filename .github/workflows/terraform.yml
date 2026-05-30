@@ -4,13 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'infra/**'   # Only trigger if changes happen inside the infrastructure folder
   pull_request:
     branches:
       - main
-    paths:
-      - 'infra/**'
 
 permissions:
   id-token: write    # CRITICAL: Required for AWS OIDC authentication
