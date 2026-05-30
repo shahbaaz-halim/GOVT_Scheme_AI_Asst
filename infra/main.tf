@@ -25,7 +25,7 @@ resource "aws_dynamodb_table" "ai_session_table" {
   }
 
   tags = {
-    Project     = "GenAI-AWS-Platform"
-    ManagedBy   = "Terraform-CI-CD"
+    Project   = "GenAI-AWS-Platform"
+    ManagedBy = "Terraform-CI-CD"
   }
 }
