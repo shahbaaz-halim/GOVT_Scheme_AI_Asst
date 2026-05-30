@@ -41,7 +41,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::731039145302:role/github-actions-terraform-executor
           aws-region: ap-south-2
-          audience: sts:amazonaws.com
+          audience: sts.amazonaws.com
 
       # Step 4: Code Quality Gate - Check for messy indentations
       - name: Terraform Format Check
