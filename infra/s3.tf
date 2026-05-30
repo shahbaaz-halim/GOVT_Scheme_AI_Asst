@@ -40,8 +40,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "audio_cleanup" {
     id     = "delete-stale-audio"
     status = "Enabled"
 
+    filter {}
+
     expiration {
-      days = 1 # Audio is temporary for the frontend; no need to pay to store it forever.
+      days = 1
     }
   }
 }
