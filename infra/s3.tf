@@ -2,7 +2,7 @@
 # 1. Document Ingestion Bucket (Raw PDFs for Bedrock)
 # ------------------------------------------------------
 resource "aws_s3_bucket" "raw_docs" {
-  bucket        = "${var.project_name}-raw-docs" 
+  bucket        = "${var.project_name}-raw-docs"
   force_destroy = true # Essential for solo dev: lets you run 'terraform destroy' even if there are files inside.
 }
 
@@ -39,7 +39,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "audio_cleanup" {
   rule {
     id     = "delete-stale-audio"
     status = "Enabled"
-    
+
     expiration {
       days = 1 # Audio is temporary for the frontend; no need to pay to store it forever.
     }

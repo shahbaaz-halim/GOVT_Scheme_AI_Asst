@@ -7,7 +7,7 @@ terraform {
       version = "~> 5.0" # Always pin your provider version to avoid breaking changes!
     }
   }
-  
+
 }
 
 provider "aws" {

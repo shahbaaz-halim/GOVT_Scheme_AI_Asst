@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "ai_services_policy_doc" {
       "${aws_s3_bucket.audio_output.arn}/*"
     ]
   }
-    
+
   # Bedrock Permissions
   statement {
     effect = "Allow"
