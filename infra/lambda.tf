@@ -12,7 +12,7 @@ resource "aws_lambda_function" "scheme_eligibility_engine" {
   role          = aws_iam_role.ai_assistant_lambda_role.arn
 
   # Deployment package parameters
-  filename         = data.archive_file.lambda_zip.output_path
+  filename = data.archive_file.lambda_zip.output_path
   # Fix: Use the correct exported base64 attribute
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 

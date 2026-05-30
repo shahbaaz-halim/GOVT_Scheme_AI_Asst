@@ -39,9 +39,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "audio_cleanup" {
   rule {
     id     = "delete-stale-audio"
     status = "Enabled"
-    
+
     filter {}
-    
+
     expiration {
       days = 1
     }
