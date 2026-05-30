@@ -13,7 +13,8 @@ resource "aws_lambda_function" "scheme_eligibility_engine" {
 
   # Deployment package parameters
   filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.source_code_hash
+  # Fix: Use the correct exported base64 attribute
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   # Execution configuration
   handler     = "app.lambda_handler"
